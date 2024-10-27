@@ -1,0 +1,11 @@
+# config.yaml
+
+redis:
+  host: 'localhost'
+  port: 6379
+  db: 0
+  password: null  # Set a password if your Redis instance requires authentication
+
+server:
+  host: '0.0.0.0'
+  port: 15000

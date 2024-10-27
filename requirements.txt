@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+redis>=4.2.0
+pyyaml
+transformers
