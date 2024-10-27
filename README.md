@@ -1,6 +1,20 @@
 # Computer-Vision-Server
 An API server for Molmo 7B - Describe web pages or computer screenshots and point to elements using Molmo 7B - a multimodal vision model which can describe real and virtual images and point at objects
 
+How to use this tool:
+- run the server to start the API server. look what port it runs on. its up to you to use a machine image with "caddy" or "nginx" setup locally to port forward, dont just expose this API directly its not secure its very basic OK?
+- run the worker - this will process the jobs in the redis queue
+- make a post request to /submit with a prompt and an image
+- it replies a 'job_id' ,
+- make post request to /status with the job_id to see when its done. replies 202 when its busy still. 200 when done
+- when done it replies the data back too
+- the api connector will make this all smooth. im uploading this more for myself so yea bad docs and no connector for you yet but soon OK still made it public spent ages on this enjoy :D
+
+  COOL STUFF::
+  - you can put the workers on different machines, if you like rent machines from vast.ai or wherever u can make a local network of machines and put the redis on one, the workers on another (can have more than 1 worker - in future will make code to spin up more using their AutoScaler from vast)
+
+
+RAMBLING::::
 Using this tool, you can describe web pages, and turn them into a JSON list of elements and actions that should be taken
 
 You can then split that list up as it's a list of JSON objects, 
