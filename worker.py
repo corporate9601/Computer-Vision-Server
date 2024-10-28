@@ -26,7 +26,7 @@ class Worker:
             decode_responses=True
         )
 
-        self.max_pixels = 250000 #300'000 max pixels  #increase if u got more than 12GB VRAM
+        self.max_pixels = 250000 #300'000 max pixels 
 
     async def __aenter__(self):
         await self.setup() #skip setup locally
@@ -38,20 +38,22 @@ class Worker:
     async def setup(self, device='auto'):
         # Load the processor
         self.processor = AutoProcessor.from_pretrained(
-            "cyan2k/molmo-7B-O-bnb-4bit", #'allenai/Molmo-7B-D-0924', <- use this if you have like 24 GB of VRAM or maybe 16GB even works.. i have 12
+            "cyan2k/molmo-7B-O-bnb-4bit", #'allenai/Molmo-7B-D-0924',
             trust_remote_code=True,
             torch_dtype='auto',
-            device_map=device
+            device_map=device,
+            low_cpu_mem_usage=True
         )
-
+        print("torch info:",torch.cuda.mem_get_info())
         # Load the model
         self.model = AutoModelForCausalLM.from_pretrained(
             "cyan2k/molmo-7B-O-bnb-4bit",
             trust_remote_code=True,
             torch_dtype='auto',
-            device_map=device
+            device_map=device,
+            low_cpu_mem_usage=True
         )
-
+        print("torch info:",torch.cuda.mem_get_info())
         #cast model to lower precision weights (eeek)
         #self.model.to(dtype=torch.bfloat16) #maybe remove this on server with nice GPU
 
@@ -74,8 +76,10 @@ class Worker:
             images=[image],
             text=prompt
         )
+        print("torch info:",torch.cuda.mem_get_info())
         print("set inputs")
         inputs = {k: v.to(self.model.device).unsqueeze(0) for k, v in inputs.items()}
+        print("torch info:",torch.cuda.mem_get_info())
         print("iterated inputs")
         '''
         output = self.model.generate_from_batch(
@@ -84,18 +88,20 @@ class Worker:
             tokenizer=self.processor.tokenizer,
         )
         '''
-        #inputs['images'] = inputs['images'].to(torch.bfloat16) #remove on server too perhaps
-        #na thise above is making it fuck out I think.. maybe. lol. commented it out. gave hallucinatory responses
+        inputs['images'] = inputs['images'].to(torch.bfloat16) #remove on server too perhaps
+        #na thise above is making it fuck out I think.. maybe. lol.
         
-        #with torch.autocast(device_type="cuda", enabled=True, dtype=torch.bfloat16): #this also didnt do any favors id rather have an OOM
-        output = self.model.generate_from_batch(
-            inputs,
-            GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
-            tokenizer=self.processor.tokenizer) #woah should it only be 200 tokens max output didnt it use to be 2000 lol
+        with torch.autocast(device_type="cuda", enabled=True, dtype=torch.float8):
+            with torch.no_grad():
+                output = self.model.generate_from_batch(
+                    inputs,
+                    GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
+                    tokenizer=self.processor.tokenizer) #woah should it only be 200 tokens max output didnt it use to be 2000 lol
         #OK so ^^ i increased the max tokens from 200 to 600 cause what if theres lots of form fields? yea.
         #but if replies are ALWAYS too long now then lower it to 200 again.
-        #OR set it ?? default 200. so you do 200 on elements, when pointing to one thing, and 600 when DESCRIBING yes! soon implement. time time time
-        
+        print("torch info:",torch.cuda.mem_get_info())
+
+        #OR set it ?? default 200. so you do 200 on elements, when pointing to one thing, and 600 when DESCRIBING
         print("generated output")
         generated_tokens = output[0, inputs['input_ids'].size(1):]
         print("got tokens generated")
@@ -104,7 +110,7 @@ class Worker:
     def encode_response(self, result):
         return result
 
-    def resize_image(self, image): #u dont have to resize if you have dank VRAM. i will soon this is going to a server today. woohoo! finally can play COD again no more CONSTANT MOlmo inference :'D
+    def resize_image(self, image):
         current_pixels = image.width*image.height
         if current_pixels <= self.max_pixels:
             return image
