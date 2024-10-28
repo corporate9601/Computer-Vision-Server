@@ -5,10 +5,13 @@ import redis.asyncio as redis
 import json
 import io
 from config import config
-
+from accelerate import init_empty_weights
 from transformers import AutoModelForCausalLM, AutoProcessor, GenerationConfig
 from PIL import Image
 import torch
+import os
+import tempfile
+
 
 class Worker:
     def __init__(self):
@@ -37,22 +40,33 @@ class Worker:
 
     async def setup(self, device='auto'):
         # Load the processor
+        offload_dir='/content/offload'
+        os.makedirs(offload_dir) if not os.path.exists(offload_dir) else None
+        
         self.processor = AutoProcessor.from_pretrained(
-            "cyan2k/molmo-7B-O-bnb-4bit", #'allenai/Molmo-7B-D-0924',
-            trust_remote_code=True,
-            torch_dtype='auto',
-            device_map=device,
-            low_cpu_mem_usage=True
-        )
-        print("torch info:",torch.cuda.mem_get_info())
-        # Load the model
-        self.model = AutoModelForCausalLM.from_pretrained(
             "cyan2k/molmo-7B-O-bnb-4bit",
             trust_remote_code=True,
             torch_dtype='auto',
             device_map=device,
-            low_cpu_mem_usage=True
+            low_cpu_mem_usage=True,
+            offload_folder = offload_dir,
+            offload_state_dict = True,
+            offload_buffers = True,
         )
+        print("torch info:",torch.cuda.mem_get_info())
+
+        with init_empty_weights():
+            # Load the model
+            self.model = AutoModelForCausalLM.from_pretrained(
+                "cyan2k/molmo-7B-O-bnb-4bit",
+                trust_remote_code=True,
+                torch_dtype='auto',
+                device_map=device,
+                low_cpu_mem_usage=True,
+                offload_folder = offload_dir,
+                offload_state_dict = True,
+                offload_buffers = True,
+                )
         print("torch info:",torch.cuda.mem_get_info())
         #cast model to lower precision weights (eeek)
         #self.model.to(dtype=torch.bfloat16) #maybe remove this on server with nice GPU
@@ -91,7 +105,7 @@ class Worker:
         inputs['images'] = inputs['images'].to(torch.bfloat16) #remove on server too perhaps
         #na thise above is making it fuck out I think.. maybe. lol.
         
-        with torch.autocast(device_type="cuda", enabled=True, dtype=torch.float8):
+        with torch.autocast(device_type="cuda", enabled=True, dtype=torch.float16):
             with torch.no_grad():
                 output = self.model.generate_from_batch(
                     inputs,
