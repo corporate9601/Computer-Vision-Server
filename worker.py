@@ -42,19 +42,20 @@ class Worker:
         # Load the processor
         offload_dir='/content/offload'
         os.makedirs(offload_dir) if not os.path.exists(offload_dir) else None
-        
+        print("Loading processor!!!!")
         self.processor = AutoProcessor.from_pretrained(
             "cyan2k/molmo-7B-O-bnb-4bit",
             trust_remote_code=True,
             torch_dtype='auto',
             device_map=device,
+            load_in_8bit=True,
             low_cpu_mem_usage=True,
             offload_folder = offload_dir,
             offload_state_dict = True,
             offload_buffers = True,
         )
         print("torch info:",torch.cuda.mem_get_info())
-
+        print("Loading the Model!")
         with init_empty_weights():
             # Load the model
             self.model = AutoModelForCausalLM.from_pretrained(
@@ -62,12 +63,14 @@ class Worker:
                 trust_remote_code=True,
                 torch_dtype='auto',
                 device_map=device,
+                load_in_8bit=True,
                 low_cpu_mem_usage=True,
                 offload_folder = offload_dir,
                 offload_state_dict = True,
                 offload_buffers = True,
                 )
         print("torch info:",torch.cuda.mem_get_info())
+        print("Done!Loaded processor AND model!")
         #cast model to lower precision weights (eeek)
         #self.model.to(dtype=torch.bfloat16) #maybe remove this on server with nice GPU
 
@@ -79,13 +82,14 @@ class Worker:
         return (image_bytes, prompt)
 
     def predict(self, input_data, max_tokens=200):
+        print("Running the PREDICT function")
         image_bytes, prompt = input_data
         print("image bytes",image_bytes)
         print("prompt",prompt)
         print("split")
         image = self.resize_image(Image.open(io.BytesIO(image_bytes)).convert('RGB'))
-        print("got image")
-        image.show()
+        print("got image and resized it... PROCESSING THE INPUTS NOW WITH PROCESSOR:")
+        #image.show()
         inputs = self.processor.process(
             images=[image],
             text=prompt
@@ -102,19 +106,20 @@ class Worker:
             tokenizer=self.processor.tokenizer,
         )
         '''
-        inputs['images'] = inputs['images'].to(torch.bfloat16) #remove on server too perhaps
+        #inputs['images'] = inputs['images'].to(torch.bfloat16) #remove on server too perhaps
         #na thise above is making it fuck out I think.. maybe. lol.
-        
-        with torch.autocast(device_type="cuda", enabled=True, dtype=torch.float16):
-            with torch.no_grad():
-                output = self.model.generate_from_batch(
-                    inputs,
-                    GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
-                    tokenizer=self.processor.tokenizer) #woah should it only be 200 tokens max output didnt it use to be 2000 lol
+
+        print("about to try to GENERATE OUTPUT..........................")
+        #with torch.autocast(device_type="cuda", enabled=True, dtype=auto):
+        with torch.no_grad():
+            output = self.model.generate_from_batch(
+                inputs,
+                GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
+                tokenizer=self.processor.tokenizer) #woah should it only be 200 tokens max output didnt it use to be 2000 lol
         #OK so ^^ i increased the max tokens from 200 to 600 cause what if theres lots of form fields? yea.
         #but if replies are ALWAYS too long now then lower it to 200 again.
         print("torch info:",torch.cuda.mem_get_info())
-
+        print("Output generated!")
         #OR set it ?? default 200. so you do 200 on elements, when pointing to one thing, and 600 when DESCRIBING
         print("generated output")
         generated_tokens = output[0, inputs['input_ids'].size(1):]
