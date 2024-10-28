@@ -29,7 +29,7 @@ class Worker:
             decode_responses=True
         )
 
-        self.max_pixels = 250000 #300'000 max pixels 
+        self.max_pixels = 300000 #300'000 max pixels 
 
     async def __aenter__(self):
         await self.setup() #skip setup locally
@@ -81,7 +81,7 @@ class Worker:
         prompt = job_data.get('prompt')
         return (image_bytes, prompt)
 
-    def predict(self, input_data, max_tokens=200):
+    def predict(self, input_data, max_tokens=600):
         print("Running the PREDICT function")
         image_bytes, prompt = input_data
         print("image bytes",image_bytes)
