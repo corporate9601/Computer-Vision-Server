@@ -29,7 +29,7 @@ class Worker:
             decode_responses=True
         )
 
-        self.max_pixels = 300000 #300'000 max pixels 
+        self.max_pixels = 1000000 #1'000'000 max pixels 
 
     async def __aenter__(self):
         await self.setup() #skip setup locally
