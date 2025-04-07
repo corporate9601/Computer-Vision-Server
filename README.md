@@ -1,10 +1,16 @@
 # Computer-Vision-Server
 An API server for Molmo 7B - Describe web pages or computer screenshots and point to elements using Molmo 7B - a multimodal vision model which can describe real and virtual images and point at objects
 
-Starting the vision server:
+Starting the vision server (windows):
 - make sure redis is running, configure it in config.yaml if neccesary. 
-- run the "start_webserver.bat" to start the API server on port 15000 (if running on a remote server setup Caddy so you can access it from outside the local network)
+- run the "start_webserver.bat" to start the API server on port 15000 (if running on a remote server in linux setup Caddy so you can access it from outside the local network)
 - run the "run_worker_windows.bat" - this will run a single worker, to process the jobs in the redis queue
+
+Starting it in linux:
+- sudo service redis-server restart
+- run app.py in a screen, detatch
+- run worker.py in another screen, detatch
+- if on a remote server like Vast.io etc, setup Caddy so you can access it. I use the latest pytorch Docker image to run mine and use Caddy to expose the local port to the internet.
 
 How to use this tool:
 - make a post request to /submit with a prompt and an image
