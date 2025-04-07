@@ -3,6 +3,8 @@ fastapi
 uvicorn[standard]
 redis>=4.2.0
 pyyaml
-transformers
+transformers==4.43.3
 python-multipart
 tensorflow[and-cuda]
+accelerate
+bitsandbytes
