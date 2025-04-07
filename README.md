@@ -10,9 +10,12 @@ How to do Computer Vision with Molmo 7B NF4 vision model on [Vast.ai](https://cl
 
 ***Starting it in linux:***
 - ```sudo service redis-server restart```
-- run app.py in a screen, detatch
-- run worker.py in another screen, detatch
+- ```python3 app.py``` (recommend doing this in a 'screen', by executing ```screen -aS webserver``` and then running the webserver. you detatch from this screen with ```CTRL+D``` and reattatch with ```screen -r webserver``` or ```screen -r -d webserver``` (if attatched still))
+- ```python3 worker.py``` (in another screen, preferably)
 - if on a remote server like [Vast.ai](https://cloud.vast.ai/?ref_id=169168) etc, setup Caddy so you can access it. I use the latest pytorch Docker image to run mine and use Caddy to expose the local port to the internet.
+
+_**Setting up Caddy on remote servers:**_
+- _Coming soon_
 
 ***How to use this tool:***
 - make a post request to /submit with a prompt and an image
