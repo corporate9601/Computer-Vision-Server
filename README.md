@@ -19,7 +19,9 @@ How to do Computer Vision with Molmo 7B NF4 vision model on [Vast.ai](https://cl
 - it replies a 'job_id' ,
 - make post request to /status with the job_id to see when its done. replies 202 when its busy still. 200 when done
 - when done it replies the data back too
-- the api connector will make this all smooth. im uploading this more for myself so yea bad docs and no connector for you yet but soon OK still made it public spent ages on this enjoy :D
+
+_**coming soon:**_
+- the api connector will make this all smooth.
 
   COOL STUFF::
   - you can put the workers on different machines, if you like rent machines from vast.ai or wherever u can make a local network of machines and put the redis on one, the workers on another (can have more than 1 worker - in future will make code to spin up more using their AutoScaler from vast)
