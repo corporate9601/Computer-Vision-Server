@@ -1,8 +1,8 @@
 # Computer-Vision-Server
-An API server for Molmo 7B - Describe web pages or computer screenshots and point to elements using Molmo 7B - a multimodal vision model which can describe real and virtual images and point at objects.
+An API server for Molmo 7B - Describe web pages or computer screenshots and point to elements using Molmo 7B - a multimodal vision model which can describe real and virtual images and point at objects. (running on a GTX 4070 Super locally and on 3090 on [Vast.io](https://cloud.vast.ai/?ref_id=169168) )
 
-How to setup Molmo 7B vision model on [Vast.io](https://cloud.vast.ai/?ref_id=169168) ? See below.
 
+How to setup Molmo 7B NF4 vision model on [Vast.io](https://cloud.vast.ai/?ref_id=169168) ? See below. 
 Starting the vision server (windows):
 - make sure redis is running, configure it in config.yaml if neccesary. 
 - run the "start_webserver.bat" to start the API server on port 15000 (if running on a remote server in linux setup Caddy so you can access it from outside the local network)
