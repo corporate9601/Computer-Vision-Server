@@ -21,7 +21,7 @@ How to do Computer Vision with Molmo 7B NF4 vision model on [Vast.ai](https://cl
 - when done it replies the data back too
 
 _**coming soon:**_
-- the api connector will make this all smooth.
+- the api connector
 
   COOL STUFF::
   - you can put the workers on different machines, if you like rent machines from vast.ai or wherever u can make a local network of machines and put the redis on one, the workers on another (can have more than 1 worker - in future will make code to spin up more using their AutoScaler from vast)
