@@ -2,6 +2,7 @@
 An API server for Molmo 7B - Describe web pages or computer screenshots and point to elements using Molmo 7B - a multimodal vision model which can describe real and virtual images and point at objects
 
 Starting the vision server:
+- make sure redis is running, configure it in config.yaml if neccesary. 
 - run the "start_webserver.bat" to start the API server on port 15000 (if running on a remote server setup Caddy so you can access it from outside the local network)
 - run the "run_worker_windows.bat" - this will run a single worker, to process the jobs in the redis queue
 
