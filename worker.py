@@ -29,7 +29,7 @@ class Worker:
             decode_responses=True
         )
 
-        self.max_pixels = 1000000 #1'000'000 max pixels 
+        self.max_pixels = 1000000 #300'000 max pixels  #now 1 million !
 
     async def __aenter__(self):
         await self.setup() #skip setup locally
@@ -44,30 +44,18 @@ class Worker:
         os.makedirs(offload_dir) if not os.path.exists(offload_dir) else None
         print("Loading processor!!!!")
         self.processor = AutoProcessor.from_pretrained(
-            "cyan2k/molmo-7B-O-bnb-4bit",
+            "Scoolar/Molmo-7B-D-0924-NF4",
             trust_remote_code=True,
-            torch_dtype='auto',
-            device_map=device,
-            load_in_8bit=True,
-            low_cpu_mem_usage=True,
-            offload_folder = offload_dir,
-            offload_state_dict = True,
-            offload_buffers = True,
+            device_map=device
         )
         print("torch info:",torch.cuda.mem_get_info())
         print("Loading the Model!")
         with init_empty_weights():
             # Load the model
             self.model = AutoModelForCausalLM.from_pretrained(
-                "cyan2k/molmo-7B-O-bnb-4bit",
+                "Scoolar/Molmo-7B-D-0924-NF4",
                 trust_remote_code=True,
-                torch_dtype='auto',
-                device_map=device,
-                load_in_8bit=True,
-                low_cpu_mem_usage=True,
-                offload_folder = offload_dir,
-                offload_state_dict = True,
-                offload_buffers = True,
+                device_map=device
                 )
         print("torch info:",torch.cuda.mem_get_info())
         print("Done!Loaded processor AND model!")
@@ -87,7 +75,7 @@ class Worker:
         print("image bytes",image_bytes)
         print("prompt",prompt)
         print("split")
-        image = self.resize_image(Image.open(io.BytesIO(image_bytes)).convert('RGB'))
+        image = self.resize_image(Image.open(io.BytesIO(image_bytes)).convert('RGB')) #
         print("got image and resized it... PROCESSING THE INPUTS NOW WITH PROCESSOR:")
         #image.show()
         inputs = self.processor.process(
@@ -111,11 +99,20 @@ class Worker:
 
         print("about to try to GENERATE OUTPUT..........................")
         #with torch.autocast(device_type="cuda", enabled=True, dtype=auto):
+
+        '''
         with torch.no_grad():
             output = self.model.generate_from_batch(
                 inputs,
                 GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
                 tokenizer=self.processor.tokenizer) #woah should it only be 200 tokens max output didnt it use to be 2000 lol
+        '''
+        with torch.autocast(device_type="cuda", enabled=True, dtype=torch.float16):
+            output = self.model.generate_from_batch(
+                inputs,
+                GenerationConfig(max_new_tokens=max_tokens, stop_strings="<|endoftext|>"),
+                tokenizer=self.processor.tokenizer
+            )
         #OK so ^^ i increased the max tokens from 200 to 600 cause what if theres lots of form fields? yea.
         #but if replies are ALWAYS too long now then lower it to 200 again.
         print("torch info:",torch.cuda.mem_get_info())
