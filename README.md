@@ -20,7 +20,7 @@ How to do Computer Vision with Molmo 7B NF4 vision model on [Vast.ai](https://cl
 - make post request to /status with the job_id to see when its done. replies 202 when its busy still. 200 when done
 - when done it replies the data back too
 
-_**coming soon:**_
+_**busy cooking:**_
 - the python api connector
 
   COOL STUFF::
@@ -51,7 +51,5 @@ so u can get insane automation of your PC but without restrictions
 
 just code the systems yourself for using the user prompt to make an "action list" and revise it every action to keep the agent as PLASTIC as possible, adapting as it acts. we so close to AGI fam.
 
-COMING SOON:
-- API connector. already cooked it and made an awesome web automation program with it.
 
   
