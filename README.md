@@ -24,7 +24,7 @@ _**coming soon:**_
 - the python api connector
 
   COOL STUFF::
-  - you can put the workers on different machines, if you like rent machines from vast.ai or wherever u can make a local network of machines and put the redis on one, the workers on another (can have more than 1 worker - in future will make code to spin up more using their AutoScaler from vast)
+  - you can put the workers on different machines, if you rent machines from [Vast.ai](https://cloud.vast.ai/?ref_id=169168) u can make a local network of machines and put the redis on one, the workers on another (can have more than 1 worker - in future will make code to spin up more using their AutoScaler from vast)
 
 
 RAMBLING::::
@@ -44,8 +44,6 @@ when prompting, start the prompt with "point_wa:" and then the rest of your prom
 
 using "point_wa:" at the start of the prompt will always force the model to reply with an X and Y location of the objects
 
-So yea enjoy ! if anything isn't clear just make an Issue this is the worst ReadMe ever I know it is rushed I'm about to put this on a server lol OK byeee
-
 PS: u can use this to make a tool just like "Computer" from anthropic but WAAAY BETTER! use this with an automation browser to do web automation! 
 ALSO:: if u want to do COMPUTER AUTOMATION with this -- search for "XVFB" and "XVFB-wrapper" to use it in python. virtual monitors. 
 and u can tell pyautogui to use the specific X11 monitor you just created in XVFB so you can have a virtual mouse and virtual keyboard for your virtual monitor. 
@@ -54,6 +52,6 @@ so u can get insane automation of your PC but without restrictions
 just code the systems yourself for using the user prompt to make an "action list" and revise it every action to keep the agent as PLASTIC as possible, adapting as it acts. we so close to AGI fam.
 
 COMING SOON:
-- API connector. already coded it and made an awesome web automation program with it.. I'm just really busy using it lol so HOLDUP! -- to the 1 person that wont find this ;D
+- API connector. already cooked it and made an awesome web automation program with it.
 
   
